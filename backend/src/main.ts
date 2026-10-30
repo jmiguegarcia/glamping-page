@@ -14,7 +14,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
 
   // Permite que el frontend de Angular llame a esta API desde otro puerto
-  app.enableCors({ origin: process.env.FRONTEND_URL ?? 'http://localhost:4200' });
+  app.enableCors({ origin: process.env.FRONTEND_URL ?? 'http://cabana.localhost:4200' });
 
   await app.listen(process.env.PORT ?? 3001);
 }

@@ -4,7 +4,7 @@ Sitio web con reservas en línea y servicios adicionales.
 
 | Carpeta | Tecnología | Puerto en desarrollo |
 |---|---|---|
-| `frontend/` | Angular 22 con SSR | http://localhost:4200 |
+| `frontend/` | Angular 22 con SSR | http://cabana.localhost:4200 (o http://localhost:4200) |
 | `backend/` | NestJS + Prisma 7 | http://localhost:3001/api |
 | — | PostgreSQL 18 (base `cabana_primavera`) | 5432 |
 
@@ -52,6 +52,11 @@ Horarios, días permitidos, tiempo de limpieza y política de cancelación:
    (`test_integrity_…`) y el de eventos (`test_events_…`). Reinicia el backend.
 3. Datos de prueba: tarjeta `4242 4242 4242 4242` (aprobada), `4111 1111 1111 1111` (rechazada),
    cualquier fecha futura y CVC de 3 dígitos. Nequi `3991111111` (aprobado).
+
+Para probar pagos abre la web en **http://cabana.localhost:4200** (es tu mismo computador): el
+firewall de Wompi bloquea el checkout si la dirección de regreso es `localhost` o `127.0.0.1`
+(error 403 de CloudFront). Por eso `FRONTEND_URL` usa `cabana.localhost`, que también está en
+`allowedHosts` del `ng serve` (`frontend/angular.json`).
 
 En desarrollo, el resultado se confirma cuando Wompi devuelve al cliente a
 `/reserva/:codigo/pago` (el backend consulta la transacción). El webhook solo funciona con el

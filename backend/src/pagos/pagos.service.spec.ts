@@ -11,7 +11,7 @@ const ENV = {
   WOMPI_LLAVE_PUBLICA: 'pub_test_llave',
   WOMPI_SECRETO_INTEGRIDAD: 'test_integrity_secreto',
   WOMPI_SECRETO_EVENTOS: 'test_events_secreto',
-  FRONTEND_URL: 'http://localhost:4200',
+  FRONTEND_URL: 'http://cabana.localhost:4200',
 };
 
 const reservaPendiente = { id: 7, codigo: 'CP-ABC234', estado: EstadoReserva.PENDIENTE_PAGO, total: 450000 };
@@ -50,7 +50,7 @@ describe('PagosService', () => {
       expect(p.get('amount-in-cents')).toBe('45000000');
       expect(p.get('currency')).toBe('COP');
       expect(p.get('reference')).toMatch(/^CP-ABC234-[0-9a-f]{8}$/);
-      expect(p.get('redirect-url')).toBe('http://localhost:4200/reserva/CP-ABC234/pago');
+      expect(p.get('redirect-url')).toBe('http://cabana.localhost:4200/reserva/CP-ABC234/pago');
       expect(p.get('signature:integrity')).toBe(
         sha256(`${p.get('reference')}45000000COP${p.get('expiration-time')}test_integrity_secreto`),
       );

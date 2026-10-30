@@ -92,7 +92,7 @@ export class PagosService {
         expiracion: expiraEn.toISOString(),
         secreto: wompi.secretoIntegridad,
       }),
-      'redirect-url': `${process.env.FRONTEND_URL ?? 'http://localhost:4200'}/reserva/${reserva.codigo}/pago`,
+      'redirect-url': `${process.env.FRONTEND_URL ?? 'http://cabana.localhost:4200'}/reserva/${reserva.codigo}/pago`,
     });
     return { urlCheckout: `${wompi.urlCheckout}?${parametros}` };
   }
