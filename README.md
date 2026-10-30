@@ -28,6 +28,20 @@ npm start
 Comprobar que todo está conectado: http://localhost:4200/api/salud debe responder
 `{"api":"ok","baseDeDatos":"ok"}`.
 
+## API (backend)
+
+| Método | Ruta | Para qué |
+|---|---|---|
+| GET | `/api/catalogo` | Cabaña, tarifas, servicios, horarios y política de cancelación |
+| GET | `/api/disponibilidad?desde=AAAA-MM-DD&hasta=AAAA-MM-DD` | Por día: noche libre, día de sol, horas de ocasional |
+| POST | `/api/reservas/cotizar` | Precio detallado y si el horario está libre (no guarda) |
+| POST | `/api/reservas` | Crea la reserva en `PENDIENTE_PAGO` |
+| GET | `/api/reservas/:codigo?email=...` | Consulta una reserva |
+| POST | `/api/reservas/:codigo/cancelar` | Cancela y calcula el reembolso |
+
+Horarios, días permitidos, tiempo de limpieza y política de cancelación:
+`backend/src/config/negocio.ts`.
+
 ## Base de datos
 
 ```bash
