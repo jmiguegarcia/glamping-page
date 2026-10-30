@@ -40,7 +40,9 @@ model Alojamiento {
 enum TipoTarifa {
   NOCHE_ENTRE_SEMANA // noches que empiezan de lunes a jueves
   NOCHE_FIN_DE_SEMANA // noches que empiezan viernes, sábado o domingo
-  DIA_DE_SOL // pasadía, sin noche (horario en src/config/negocio.ts)
+  DIA_DE_SOL // pasadía, sin noche
+  OCASIONAL // bloque de horas, sin noche
+  // Horarios y días permitidos de cada tipo: src/config/negocio.ts
 }
 
 /// Precio de un alojamiento según el tipo de día. Una fila por tipo.
@@ -57,7 +59,7 @@ model Tarifa {
 }
 
 /// Servicio adicional que se suma a la reserva (desayuno, jacuzzi...).
-/// En una estadía se cobra por cada noche; en un día de sol, una sola vez.
+/// En una estadía se cobra por cada noche; en un día de sol u ocasional, una sola vez.
 model Servicio {
   id          Int               @id @default(autoincrement())
   slug        String            @unique
@@ -93,21 +95,33 @@ enum EstadoReserva {
 
 enum TipoReserva {
   ESTADIA // una o más noches
-  DIA_DE_SOL // pasadía sin noche: fechaSalida = fechaEntrada + 1 día y noches = 0. Puede compartir fecha con una estadía que entra o sale ese día
+  DIA_DE_SOL // pasadía de un día, sin noche
+  OCASIONAL // bloque de horas (ej. 4 h) un día, sin noche
 }
 
 model Reserva {
-  id            Int           @id @default(autoincrement())
-  codigo        String        @unique // código corto para el cliente, ej: CP-7K3M9Q
-  tipo          TipoReserva   @default(ESTADIA)
-  alojamientoId Int           @map("alojamiento_id")
-  clienteId     Int           @map("cliente_id")
-  fechaEntrada  DateTime      @map("fecha_entrada") @db.Date
-  fechaSalida   DateTime      @map("fecha_salida") @db.Date
-  noches        Int
-  huespedes     Int
-  estado        EstadoReserva @default(PENDIENTE_PAGO)
-  notas         String?
+  id            Int         @id @default(autoincrement())
+  codigo        String      @unique // código corto para el cliente, ej: CP-7K3M9Q
+  tipo          TipoReserva @default(ESTADIA)
+  alojamientoId Int         @map("alojamiento_id")
+  clienteId     Int         @map("cliente_id")
+
+  // Fechas para mostrar y cobrar. Día de sol y ocasional: entrada = salida, 0 noches.
+  fechaEntrada DateTime @map("fecha_entrada") @db.Date
+  fechaSalida  DateTime @map("fecha_salida") @db.Date
+  noches       Int
+
+  // Momento exacto en que la reserva ocupa la cabaña (con hora y zona horaria).
+  // Se calculan con los horarios de src/config/negocio.ts al crear la reserva.
+  // bloqueoHasta = fin + tiempo de limpieza. PostgreSQL rechaza dos reservas
+  // activas cuyos [inicio, bloqueoHasta) se crucen.
+  inicio       DateTime @db.Timestamptz
+  fin          DateTime @db.Timestamptz
+  bloqueoHasta DateTime @map("bloqueo_hasta") @db.Timestamptz
+
+  huespedes Int
+  estado    EstadoReserva @default(PENDIENTE_PAGO)
+  notas     String?
 
   // Totales guardados al momento de reservar: si mañana cambian los precios,
   // la reserva conserva lo que el cliente aceptó pagar.

@@ -22,6 +22,7 @@ const tarifasCabana: Record<TipoTarifa, number> = {
   NOCHE_ENTRE_SEMANA: 320_000,
   NOCHE_FIN_DE_SEMANA: 450_000,
   DIA_DE_SOL: 250_000,
+  OCASIONAL: 120_000,
 };
 
 const servicios = [
@@ -70,7 +71,7 @@ async function main() {
     await prisma.servicio.upsert({ where: { slug: s.slug }, update: s, create: s });
   }
 
-  console.log(`Seed listo: 1 alojamiento, 3 tarifas, ${servicios.length} servicios.`);
+  console.log(`Seed listo: 1 alojamiento, ${Object.keys(tarifasCabana).length} tarifas, ${servicios.length} servicios.`);
 }
 
 try {
