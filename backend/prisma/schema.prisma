@@ -2,6 +2,12 @@
 // Aquí se definen las tablas (modelos). Después de cambiarlo ejecuta:
 //   npx prisma migrate dev --name <descripcion-del-cambio>
 // Docs: https://pris.ly/d/prisma-schema
+//
+// Convenciones:
+// - Dinero en pesos colombianos (COP) como enteros: 350000 = $350.000. COP no usa centavos.
+// - Fechas de estadía como DATE (sin hora): la salida es la mañana del último día,
+//   así que una reserva del 10 al 12 son 2 noches.
+// - Nombres en camelCase en el código y snake_case en PostgreSQL (@map / @@map).
 
 generator client {
   provider            = "prisma-client"
@@ -14,4 +20,159 @@ datasource db {
   provider = "postgresql"
 }
 
-// Los modelos (Alojamiento, Servicio, Reserva...) se agregan en la etapa 2.
+// ───────────── Catálogo ─────────────
+
+/// Unidad que se reserva: hoy una cabaña para 2, mañana pueden ser más.
+model Alojamiento {
+  id          Int       @id @default(autoincrement())
+  slug        String    @unique // para la URL: /alojamientos/cabana-primavera
+  nombre      String
+  descripcion String
+  capacidad   Int // número máximo de huéspedes
+  activo      Boolean   @default(true)
+  creadoEn    DateTime  @default(now()) @map("creado_en")
+  tarifas     Tarifa[]
+  reservas    Reserva[]
+
+  @@map("alojamientos")
+}
+
+enum TipoTarifa {
+  NOCHE_ENTRE_SEMANA // noches que empiezan de lunes a jueves
+  NOCHE_FIN_DE_SEMANA // noches que empiezan viernes, sábado o domingo
+  DIA_DE_SOL // pasadía, sin noche (horario en src/config/negocio.ts)
+}
+
+/// Precio de un alojamiento según el tipo de día. Una fila por tipo.
+model Tarifa {
+  id            Int        @id @default(autoincrement())
+  alojamientoId Int        @map("alojamiento_id")
+  tipo          TipoTarifa
+  precio        Int
+
+  alojamiento Alojamiento @relation(fields: [alojamientoId], references: [id], onDelete: Cascade)
+
+  @@unique([alojamientoId, tipo])
+  @@map("tarifas")
+}
+
+/// Servicio adicional que se suma a la reserva (desayuno, jacuzzi...).
+/// En una estadía se cobra por cada noche; en un día de sol, una sola vez.
+model Servicio {
+  id          Int               @id @default(autoincrement())
+  slug        String            @unique
+  nombre      String
+  descripcion String
+  precio      Int
+  activo      Boolean           @default(true)
+  reservas    ReservaServicio[]
+
+  @@map("servicios")
+}
+
+// ───────────── Reservas ─────────────
+
+model Cliente {
+  id       Int       @id @default(autoincrement())
+  nombre   String
+  email    String    @unique
+  telefono String
+  creadoEn DateTime  @default(now()) @map("creado_en")
+  reservas Reserva[]
+
+  @@map("clientes")
+}
+
+enum EstadoReserva {
+  PENDIENTE_PAGO // creada, fechas bloqueadas mientras el cliente paga (hasta expiraEn)
+  CONFIRMADA // pago aprobado
+  CANCELADA // cancelada por el cliente o el administrador
+  EXPIRADA // no se pagó a tiempo; las fechas se liberan
+  COMPLETADA // la estadía ya ocurrió
+}
+
+enum TipoReserva {
+  ESTADIA // una o más noches
+  DIA_DE_SOL // pasadía sin noche: fechaSalida = fechaEntrada + 1 día y noches = 0. Puede compartir fecha con una estadía que entra o sale ese día
+}
+
+model Reserva {
+  id            Int           @id @default(autoincrement())
+  codigo        String        @unique // código corto para el cliente, ej: CP-7K3M9Q
+  tipo          TipoReserva   @default(ESTADIA)
+  alojamientoId Int           @map("alojamiento_id")
+  clienteId     Int           @map("cliente_id")
+  fechaEntrada  DateTime      @map("fecha_entrada") @db.Date
+  fechaSalida   DateTime      @map("fecha_salida") @db.Date
+  noches        Int
+  huespedes     Int
+  estado        EstadoReserva @default(PENDIENTE_PAGO)
+  notas         String?
+
+  // Totales guardados al momento de reservar: si mañana cambian los precios,
+  // la reserva conserva lo que el cliente aceptó pagar.
+  subtotalAlojamiento Int @map("subtotal_alojamiento")
+  subtotalServicios   Int @map("subtotal_servicios")
+  total               Int
+
+  expiraEn       DateTime? @map("expira_en") // límite para pagar si está PENDIENTE_PAGO
+  canceladaEn    DateTime? @map("cancelada_en")
+  montoReembolso Int?      @map("monto_reembolso") // según la política de cancelación
+  creadoEn       DateTime  @default(now()) @map("creado_en")
+  actualizadoEn  DateTime  @updatedAt @map("actualizado_en")
+
+  alojamiento Alojamiento       @relation(fields: [alojamientoId], references: [id])
+  cliente     Cliente           @relation(fields: [clienteId], references: [id])
+  servicios   ReservaServicio[]
+  pagos       Pago[]
+
+  @@index([alojamientoId, fechaEntrada, fechaSalida])
+  @@map("reservas")
+}
+
+/// Tabla intermedia reserva ↔ servicio, con el precio que se aplicó.
+model ReservaServicio {
+  reservaId      Int @map("reserva_id")
+  servicioId     Int @map("servicio_id")
+  precioUnitario Int @map("precio_unitario")
+  cantidad       Int // noches de la estadía, o 1 en un día de sol
+  subtotal       Int
+
+  reserva  Reserva  @relation(fields: [reservaId], references: [id], onDelete: Cascade)
+  servicio Servicio @relation(fields: [servicioId], references: [id])
+
+  @@id([reservaId, servicioId])
+  @@map("reservas_servicios")
+}
+
+// ───────────── Pagos ─────────────
+
+enum TipoPago {
+  COBRO
+  REEMBOLSO
+}
+
+enum EstadoPago {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+  ANULADO
+}
+
+/// Cada intento de cobro o reembolso con la pasarela (Wompi u otra).
+model Pago {
+  id            Int        @id @default(autoincrement())
+  reservaId     Int        @map("reserva_id")
+  tipo          TipoPago   @default(COBRO)
+  estado        EstadoPago @default(PENDIENTE)
+  monto         Int
+  proveedor     String // "wompi", "mercadopago"...
+  referencia    String     @unique // id de la transacción en la pasarela
+  respuesta     Json? // respuesta completa de la pasarela, para auditoría
+  creadoEn      DateTime   @default(now()) @map("creado_en")
+  actualizadoEn DateTime   @updatedAt @map("actualizado_en")
+
+  reserva Reserva @relation(fields: [reservaId], references: [id])
+
+  @@map("pagos")
+}
