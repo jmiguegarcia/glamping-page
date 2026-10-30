@@ -1,0 +1,17 @@
+# Dependencias y builds
+node_modules/
+dist/
+.angular/
+coverage/
+
+# Cliente de Prisma generado (se recrea con `npx prisma generate`)
+backend/src/generated/
+
+# Variables de entorno (contraseñas, claves) — nunca subir
+.env
+.env.*
+!.env.example
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
