@@ -42,6 +42,14 @@ describe('cotizar estadía', () => {
     expect(c.subtotalAlojamiento).toBe(770_000);
   });
 
+  it('describe cada noche con una fecha legible para el cliente', () => {
+    const c = cotizar(solicitud({ fechaSalida: '2026-12-12' }), catalogo, AHORA);
+    expect(c.alojamiento.map((l) => l.concepto)).toEqual([
+      'Noche del jueves 10 de diciembre',
+      'Noche del viernes 11 de diciembre',
+    ]);
+  });
+
   it('la noche del domingo es tarifa de fin de semana', () => {
     const c = cotizar(solicitud({ fechaEntrada: '2026-12-13', fechaSalida: '2026-12-14' }), catalogo, AHORA);
     expect(c.alojamiento[0].tarifa).toBe('NOCHE_FIN_DE_SEMANA');

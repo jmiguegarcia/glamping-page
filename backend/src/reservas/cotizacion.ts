@@ -8,7 +8,7 @@ import { TipoReserva, TipoTarifa } from '../generated/prisma/enums.js';
 import {
   diaSemana,
   diasEntre,
-  formatearFecha,
+  fechaLegible,
   formatearHora,
   instante,
   minutosDelDia,
@@ -34,7 +34,7 @@ export interface Catalogo {
 }
 
 export interface LineaAlojamiento {
-  concepto: string; // "Noche del viernes 2026-12-11"
+  concepto: string; // "Noche del viernes 11 de diciembre"
   tarifa: TipoTarifa;
   precio: number;
 }
@@ -133,7 +133,7 @@ function horarioEstadia(sol: SolicitudCotizacion, entrada: Date, catalogo: Catal
       ? TipoTarifa.NOCHE_FIN_DE_SEMANA
       : TipoTarifa.NOCHE_ENTRE_SEMANA;
     alojamiento.push({
-      concepto: `Noche del ${nombreDia(dia)} ${formatearFecha(fecha)}`,
+      concepto: `Noche del ${fechaLegible(fecha)}`,
       tarifa,
       precio: precioTarifa(catalogo, tarifa),
     });
@@ -159,7 +159,7 @@ function horarioDiaDeSol(fecha: Date, catalogo: Catalogo): Horario {
     fin: instante(fecha, DIA_DE_SOL.fin),
     alojamiento: [
       {
-        concepto: `Día de sol ${formatearFecha(fecha)} (${DIA_DE_SOL.inicio}–${DIA_DE_SOL.fin})`,
+        concepto: `Día de sol del ${fechaLegible(fecha)}`,
         tarifa: TipoTarifa.DIA_DE_SOL,
         precio: precioTarifa(catalogo, TipoTarifa.DIA_DE_SOL),
       },
@@ -184,7 +184,7 @@ function horarioOcasional(sol: SolicitudCotizacion, fecha: Date, catalogo: Catal
     fin: instante(fecha, fin),
     alojamiento: [
       {
-        concepto: `Ocasional ${formatearFecha(fecha)} (${sol.horaInicio}–${fin})`,
+        concepto: `Ocasional del ${fechaLegible(fecha)}, ${sol.horaInicio}–${fin}`,
         tarifa: TipoTarifa.OCASIONAL,
         precio: precioTarifa(catalogo, TipoTarifa.OCASIONAL),
       },

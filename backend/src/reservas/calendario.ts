@@ -43,6 +43,13 @@ export function nombreDia(dia: number): string {
   return NOMBRES_DIAS[dia];
 }
 
+const formatoDiaMes = new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'long', timeZone: 'UTC' });
+
+/** Fecha para mostrar al cliente: "jueves 12 de noviembre". */
+export function fechaLegible(fecha: Date): string {
+  return `${nombreDia(diaSemana(fecha))} ${formatoDiaMes.format(fecha)}`;
+}
+
 /** "14:30" → 870. Acepta "24:00" (= 1440, medianoche al final del día). */
 export function minutosDelDia(hhmm: string): number {
   const [h, m] = hhmm.split(':').map(Number);
