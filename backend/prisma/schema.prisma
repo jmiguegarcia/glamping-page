@@ -181,8 +181,9 @@ model Pago {
   estado        EstadoPago @default(PENDIENTE)
   monto         Int
   proveedor     String // "wompi", "mercadopago"...
-  referencia    String     @unique // id de la transacción en la pasarela
-  respuesta     Json? // respuesta completa de la pasarela, para auditoría
+  referencia    String     @unique // nuestra referencia, la que firmamos y enviamos a la pasarela (ej. CP-7K3M9Q-lx2a9f)
+  idTransaccion String?    @unique @map("id_transaccion") // id que asigna la pasarela al cobro
+  respuesta     Json? // última respuesta de la pasarela, para auditoría
   creadoEn      DateTime   @default(now()) @map("creado_en")
   actualizadoEn DateTime   @updatedAt @map("actualizado_en")
 

@@ -3,6 +3,7 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException }
 import { MINUTOS_PARA_PAGAR } from '../config/negocio.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { EstadoReserva } from '../generated/prisma/enums.js';
+import { CRUCE_DE_HORARIO, codigoPostgres } from '../prisma/errores.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { diasEntre, formatearFecha, instante, parsearFecha, sumarDias } from './calendario.js';
 import { calcularReembolso } from './cancelacion.js';
@@ -124,7 +125,7 @@ export class ReservasService {
         });
         return formatearReserva(reserva);
       } catch (e) {
-        if (codigoPostgres(e) === '23P01') throw new ConflictException(MENSAJE_NO_DISPONIBLE);
+        if (codigoPostgres(e) === CRUCE_DE_HORARIO) throw new ConflictException(MENSAJE_NO_DISPONIBLE);
         if (esCodigoRepetido(e) && intento < 3) continue;
         throw e;
       }
@@ -158,8 +159,8 @@ export class ReservasService {
     return { ...formatearReserva(cancelada), reembolso: { porcentaje: reembolso.porcentaje, monto: reembolso.monto } };
   }
 
-  /** Libera las fechas de reservas que no se pagaron a tiempo. */
-  private async expirarPendientes() {
+  /** Libera las fechas de reservas que no se pagaron a tiempo. (También la usa PagosService.) */
+  async expirarPendientes() {
     await this.prisma.reserva.updateMany({
       where: { estado: EstadoReserva.PENDIENTE_PAGO, expiraEn: { lt: new Date() } },
       data: { estado: EstadoReserva.EXPIRADA },
@@ -204,13 +205,6 @@ function generarCodigo(): string {
   let codigo = 'CP-';
   for (let i = 0; i < 6; i++) codigo += ALFABETO[randomInt(ALFABETO.length)];
   return codigo;
-}
-
-/** Código de error original de PostgreSQL dentro de un error de Prisma (ej. "23P01"). */
-function codigoPostgres(e: unknown): string | undefined {
-  if (!(e instanceof Prisma.PrismaClientKnownRequestError)) return undefined;
-  const meta = e.meta as { driverAdapterError?: { cause?: { originalCode?: string } } } | undefined;
-  return meta?.driverAdapterError?.cause?.originalCode;
 }
 
 function esCodigoRepetido(e: unknown): boolean {
