@@ -38,9 +38,27 @@ Comprobar que todo está conectado: http://localhost:4200/api/salud debe respond
 | POST | `/api/reservas` | Crea la reserva en `PENDIENTE_PAGO` |
 | GET | `/api/reservas/:codigo?email=...` | Consulta una reserva |
 | POST | `/api/reservas/:codigo/cancelar` | Cancela y calcula el reembolso |
+| POST | `/api/pagos/iniciar` | Prepara el cobro y devuelve la URL firmada del checkout de Wompi |
+| GET | `/api/pagos/wompi/transacciones/:id` | Consulta a Wompi el resultado (al volver del checkout) |
+| POST | `/api/pagos/wompi/eventos` | Webhook de Wompi (URL de eventos del dashboard) |
 
 Horarios, días permitidos, tiempo de limpieza y política de cancelación:
 `backend/src/config/negocio.ts`.
+
+## Pagos (Wompi)
+
+1. En el dashboard de Wompi, modo **Sandbox**: *Desarrolladores → Secretos para integración técnica*.
+2. Copia en `backend/.env` la llave pública (`pub_test_…`), el secreto de integridad
+   (`test_integrity_…`) y el de eventos (`test_events_…`). Reinicia el backend.
+3. Datos de prueba: tarjeta `4242 4242 4242 4242` (aprobada), `4111 1111 1111 1111` (rechazada),
+   cualquier fecha futura y CVC de 3 dígitos. Nequi `3991111111` (aprobado).
+
+En desarrollo, el resultado se confirma cuando Wompi devuelve al cliente a
+`/reserva/:codigo/pago` (el backend consulta la transacción). El webhook solo funciona con el
+sitio publicado: entonces se configura `https://<dominio>/api/pagos/wompi/eventos` como URL de eventos.
+
+Los **reembolsos** por cancelación se hacen desde el dashboard de Wompi; la reserva guarda el
+monto a devolver en `monto_reembolso`.
 
 ## Base de datos
 
