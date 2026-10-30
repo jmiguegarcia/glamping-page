@@ -1,0 +1,529 @@
+:host {
+  display: block;
+}
+
+.reservar {
+  padding-block: clamp(24px, 4vw, 48px) var(--espacio-seccion);
+}
+
+.encabezado {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: clamp(24px, 4vw, 40px);
+}
+
+.disposicion {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  align-items: start;
+  gap: clamp(24px, 4vw, 48px);
+}
+
+.pasos {
+  display: grid;
+  gap: 1.25rem;
+}
+
+// ─── Cada paso es una tarjeta ───
+
+.paso {
+  margin: 0;
+  padding: clamp(20px, 3vw, 28px);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio-grande);
+  background: #fff;
+  min-width: 0;
+}
+
+legend,
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding: 0;
+  font-family: var(--fuente-titulo);
+  font-size: 1.35rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+// <legend> dentro de <fieldset> se dibuja sobre el borde; float lo mete en la tarjeta.
+legend {
+  float: left;
+  width: 100%;
+
+  + * {
+    clear: both;
+  }
+}
+
+.numero {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--arena-suave);
+  color: var(--tinta);
+  font-family: var(--fuente-texto);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.instruccion {
+  margin-bottom: 1rem;
+  color: var(--tinta-suave);
+}
+
+.aclaracion {
+  font-size: 0.88rem;
+  color: var(--tinta-suave);
+}
+
+.mensaje-error {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radio);
+  background: #fbeae6;
+  color: #8a2e1d;
+  font-size: 0.92rem;
+}
+
+// Opciones seleccionables (tipo, servicio, hora) comparten el mismo lenguaje visual.
+%opcion {
+  border: 1.5px solid var(--linea);
+  border-radius: var(--radio);
+  background: var(--crema);
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+
+  &:hover {
+    border-color: var(--azul);
+  }
+
+  &.elegido,
+  &.elegida {
+    border-color: var(--azul);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgb(52 88 103 / 0.12);
+  }
+}
+
+// Inputs nativos ocultos visualmente pero accesibles (la tarjeta entera es la etiqueta).
+.tipo input,
+.servicio input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tipo:has(input:focus-visible),
+.servicio:has(input:focus-visible) {
+  outline: 3px solid var(--arena);
+  outline-offset: 2px;
+}
+
+// ─── 1. Tipo ───
+
+.tipos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.tipo {
+  @extend %opcion;
+  position: relative;
+  display: grid;
+  gap: 0.15rem;
+  padding: 1rem;
+}
+
+.tipo-nombre {
+  font-family: var(--fuente-titulo);
+  font-size: 1.15rem;
+}
+
+.tipo-detalle {
+  font-size: 0.85rem;
+  color: var(--tinta-suave);
+}
+
+.tipo-precio {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--azul);
+}
+
+// ─── 2. Fechas ───
+
+.enlace {
+  margin-top: 0.75rem;
+  padding: 0.25rem 0;
+  border: 0;
+  background: none;
+  color: var(--azul);
+  font: 500 0.92rem var(--fuente-texto);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+  color: var(--tinta-suave);
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}
+
+.muestra {
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+
+  &.libre {
+    background: #fff;
+    box-shadow: inset 0 0 0 1px var(--linea);
+  }
+
+  &.ocupado {
+    background: var(--crema-2);
+  }
+
+  &.elegido {
+    background: var(--azul);
+  }
+}
+
+.horas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+
+.hora {
+  @extend %opcion;
+  padding: 0.75rem;
+  font: 500 0.92rem var(--fuente-texto);
+  color: var(--tinta);
+}
+
+// ─── 3. Huéspedes y servicios ───
+
+.servicios {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.servicio {
+  @extend %opcion;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+
+  // Casilla dibujada a mano: refleja el estado del input oculto.
+  &::before {
+    content: '';
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid var(--tinta-suave);
+    border-radius: 6px;
+    background: #fff center / 12px no-repeat;
+  }
+
+  &.elegido::before {
+    border-color: var(--azul);
+    background-color: var(--azul);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cpath d='M1 5l3.5 3.5L11 1' fill='none' stroke='%23f7f2ea' stroke-width='2'/%3E%3C/svg%3E");
+  }
+}
+
+.servicio-texto {
+  display: grid;
+  flex: 1;
+}
+
+.servicio-nombre {
+  font-weight: 600;
+}
+
+.servicio-descripcion {
+  font-size: 0.85rem;
+  color: var(--tinta-suave);
+}
+
+.servicio-precio {
+  font-weight: 600;
+  color: var(--azul);
+  white-space: nowrap;
+  text-align: right;
+
+  small {
+    display: block;
+    font-weight: 400;
+    color: var(--tinta-suave);
+  }
+}
+
+// ─── 4. Datos ───
+
+.campos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.25rem 1rem;
+}
+
+.campo {
+  display: grid;
+  gap: 0.35rem;
+
+  label {
+    font-weight: 500;
+    font-size: 0.92rem;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1.5px solid var(--linea);
+    border-radius: var(--radio);
+    background: var(--crema);
+    color: var(--tinta);
+    font: 1rem var(--fuente-texto); // 16px: evita el zoom automático en iPhone
+
+    &:focus {
+      border-color: var(--azul);
+      background: #fff;
+      outline: none;
+      box-shadow: 0 0 0 3px rgb(52 88 103 / 0.15);
+    }
+
+    &[aria-invalid='true'] {
+      border-color: #b3412a;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+  }
+}
+
+.campo-ancho {
+  grid-column: 1 / -1;
+}
+
+.opcional {
+  font-weight: 400;
+  color: var(--tinta-suave);
+}
+
+.error-campo {
+  min-height: 1.3em; // reserva el espacio: el formulario no salta al aparecer un error
+  font-size: 0.85rem;
+  color: #a33a24;
+}
+
+// ─── Resumen ───
+
+.resumen {
+  position: sticky;
+  top: calc(var(--alto-encabezado) + 16px);
+  display: grid;
+  gap: 1rem;
+  padding: clamp(20px, 3vw, 28px);
+  border-radius: var(--radio-grande);
+  background: var(--noche);
+  color: var(--crema-noche);
+
+  h2 {
+    font-size: 1.6rem;
+  }
+
+  .aclaracion {
+    color: var(--crema-noche-suave);
+  }
+}
+
+.resumen-tipo {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--arena);
+}
+
+.resumen-fechas {
+  font-family: var(--fuente-titulo);
+  font-size: 1.15rem;
+  line-height: 1.35;
+  text-transform: capitalize;
+}
+
+.lineas {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 1rem 0;
+  border-block: 1px solid var(--linea-noche);
+  list-style: none;
+  font-size: 0.9rem;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  span:first-child {
+    color: var(--crema-noche-suave);
+  }
+}
+
+.total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 1rem;
+
+  strong {
+    font-family: var(--fuente-titulo);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--crema-noche);
+  }
+}
+
+.confirmar {
+  width: 100%;
+  background: var(--arena);
+  color: var(--noche);
+
+  &:hover:not(:disabled) {
+    background: var(--arena-suave);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+// ─── Confirmación ───
+
+.confirmacion {
+  display: grid;
+  gap: 1.5rem;
+  justify-items: start;
+  max-width: 760px;
+}
+
+.tarjeta-codigo {
+  padding: 1.5rem 2rem;
+  border-radius: var(--radio-grande);
+  background: var(--noche);
+  color: var(--crema-noche);
+
+  .aclaracion {
+    color: var(--crema-noche-suave);
+  }
+}
+
+.codigo {
+  font-family: var(--fuente-titulo);
+  font-size: clamp(2rem, 6vw, 3rem);
+  letter-spacing: 0.06em;
+  color: var(--arena);
+}
+
+.detalle-confirmacion {
+  display: grid;
+  gap: 0.6rem;
+  width: 100%;
+  margin: 0;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--linea);
+  }
+
+  dt {
+    color: var(--tinta-suave);
+  }
+
+  dd {
+    margin: 0;
+    text-align: right;
+    text-transform: capitalize;
+  }
+
+  .total {
+    margin: 0;
+    font-family: var(--fuente-titulo);
+    font-size: 1.5rem;
+    color: var(--azul);
+  }
+}
+
+.aviso-pago {
+  padding: 1rem 1.25rem;
+  border-left: 4px solid var(--arena);
+  border-radius: var(--radio);
+  background: var(--crema-2);
+}
+
+// ─── Celular y tableta ───
+
+@media (max-width: 960px) {
+  .disposicion {
+    grid-template-columns: 1fr;
+  }
+
+  .resumen {
+    position: static;
+  }
+}
+
+@media (max-width: 600px) {
+  .tipos,
+  .campos {
+    grid-template-columns: 1fr;
+  }
+
+  .servicio {
+    flex-wrap: wrap;
+  }
+
+  .servicio-precio {
+    width: 100%;
+    padding-left: calc(20px + 1rem);
+    text-align: left;
+
+    small {
+      display: inline;
+    }
+  }
+}

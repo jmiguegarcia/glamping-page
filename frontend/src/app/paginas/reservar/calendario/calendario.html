@@ -1,0 +1,47 @@
+<div class="cabecera">
+  <button
+    type="button"
+    class="flecha"
+    [disabled]="!puedeRetroceder()"
+    (click)="mover(-1)"
+    aria-label="Mes anterior"
+  >
+    ‹
+  </button>
+  <p class="titulo" aria-live="polite">{{ titulo() }}</p>
+  <button type="button" class="flecha" [disabled]="!puedeAvanzar()" (click)="mover(1)" aria-label="Mes siguiente">
+    ›
+  </button>
+</div>
+
+<div class="dias-semana" aria-hidden="true">
+  @for (dia of diasSemana; track dia.corto) {
+    <span [title]="dia.largo">{{ dia.corto }}</span>
+  }
+</div>
+
+<div class="mes" role="group" [attr.aria-label]="titulo()">
+  @for (semana of semanas(); track $index) {
+    @for (dia of semana; track $index) {
+      @if (dia) {
+        @let estado = estadoDia()(dia);
+        <button
+          type="button"
+          class="dia"
+          [class]="estado"
+          [class.desde]="dia === desde()"
+          [class.hasta]="dia === hasta()"
+          [class.en-rango]="enRango(dia)"
+          [disabled]="estado !== 'libre'"
+          [attr.aria-pressed]="dia === desde() || dia === hasta()"
+          [attr.aria-label]="etiqueta(dia, estado)"
+          (click)="elegir.emit(dia)"
+        >
+          {{ numero(dia) }}
+        </button>
+      } @else {
+        <span class="hueco" aria-hidden="true"></span>
+      }
+    }
+  }
+</div>

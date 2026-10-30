@@ -1,0 +1,276 @@
+@if (reserva(); as r) {
+  <!-- ─── Reserva creada ─── -->
+  <section class="confirmacion contenedor seccion" aria-labelledby="titulo-confirmacion">
+    <span class="etiqueta">Reserva apartada</span>
+    <h1 id="titulo-confirmacion">¡Listo, {{ r.cliente.nombre }}! <em>Tu escapada está apartada.</em></h1>
+
+    <div class="tarjeta-codigo">
+      <p>Tu código de reserva</p>
+      <p class="codigo">{{ r.codigo }}</p>
+      <p class="aclaracion">Guárdalo: lo necesitas para consultar o cancelar tu reserva.</p>
+    </div>
+
+    <dl class="detalle-confirmacion">
+      <div>
+        <dt>Fechas</dt>
+        <dd>{{ resumenFechas() }}</dd>
+      </div>
+      <div>
+        <dt>Huéspedes</dt>
+        <dd>{{ r.huespedes }}</dd>
+      </div>
+      @if (r.servicios.length) {
+        <div>
+          <dt>Servicios</dt>
+          <dd>
+            @for (s of r.servicios; track s.slug) {
+              {{ s.nombre }}{{ $last ? '' : ', ' }}
+            }
+          </dd>
+        </div>
+      }
+      <div>
+        <dt>Total</dt>
+        <dd class="total">{{ r.total | pesos }}</dd>
+      </div>
+    </dl>
+
+    <p class="aviso-pago" role="status">
+      Tus fechas quedan apartadas hasta las <strong>{{ horaLimite(r.expiraEn) }}</strong> mientras completas el pago
+      en línea, que estará disponible muy pronto. Te escribiremos a <strong>{{ r.cliente.email }}</strong>.
+    </p>
+
+    <a class="boton boton-borde" routerLink="/">Volver al inicio</a>
+  </section>
+} @else {
+  <section class="reservar contenedor" aria-labelledby="titulo-reservar">
+    <header class="encabezado">
+      <span class="etiqueta">Reservar</span>
+      <h1 id="titulo-reservar">Arma tu <em>escapada.</em></h1>
+    </header>
+
+    <div class="disposicion">
+      <div class="pasos">
+        <!-- 1. Tipo -->
+        <fieldset class="paso">
+          <legend><span class="numero">1</span> ¿Cómo quieres vivirla?</legend>
+          <div class="tipos">
+            @for (t of tipos; track t.tipo) {
+              <label class="tipo" [class.elegido]="tipoElegido() === t.tipo">
+                <input
+                  type="radio"
+                  name="tipo"
+                  [value]="t.tipo"
+                  [checked]="tipoElegido() === t.tipo"
+                  (change)="elegirTipo(t.tipo)"
+                />
+                <span class="tipo-nombre">{{ t.nombre }}</span>
+                <span class="tipo-detalle">{{ t.detalle }}</span>
+                @if (precioPorTipo()[t.tipo]; as precio) {
+                  <span class="tipo-precio">Desde {{ precio | pesos }}</span>
+                }
+              </label>
+            }
+          </div>
+        </fieldset>
+
+        <!-- 2. Fechas -->
+        <fieldset class="paso">
+          <legend><span class="numero">2</span> {{ tipoElegido() === 'ESTADIA' ? 'Fechas' : 'Día' }}</legend>
+          <p class="instruccion" aria-live="polite">{{ instruccionFechas() }}</p>
+
+          <app-calendario
+            [(mes)]="mes"
+            [minMes]="mesMinimo"
+            [maxMes]="mesMaximo"
+            [estadoDia]="estadoDia()"
+            [desde]="entrada()"
+            [hasta]="salida()"
+            (elegir)="elegirFecha($event)"
+          />
+
+          @if (tipoElegido() === 'ESTADIA' && entrada()) {
+            <button type="button" class="enlace" (click)="borrarFechas()">Elegir otra fecha de llegada</button>
+          }
+
+          <ul class="leyenda" aria-label="Leyenda del calendario">
+            <li><span class="muestra libre"></span> Disponible</li>
+            <li><span class="muestra ocupado"></span> Ocupado</li>
+            <li><span class="muestra elegido"></span> Tu elección</li>
+          </ul>
+
+          @if (errorDisponibilidad(); as error) {
+            <p class="mensaje-error" role="alert">{{ error }}</p>
+          }
+
+          @if (horasDisponibles().length) {
+            <div class="horas" role="radiogroup" aria-label="Hora de inicio">
+              @for (h of horasDisponibles(); track h.hora) {
+                <button
+                  type="button"
+                  role="radio"
+                  class="hora"
+                  [class.elegida]="hora() === h.hora"
+                  [attr.aria-checked]="hora() === h.hora"
+                  (click)="hora.set(h.hora)"
+                >
+                  {{ h.texto }}
+                </button>
+              }
+            </div>
+          }
+        </fieldset>
+
+        <!-- 3. Extras -->
+        <fieldset class="paso">
+          <legend><span class="numero">3</span> Extras</legend>
+          <p class="instruccion">Agrega lo que quieras para hacerla especial. Son opcionales.</p>
+
+          @if (listaServicios().length) {
+            <ul class="servicios">
+              @for (s of listaServicios(); track s.slug) {
+                <li>
+                  <label class="servicio" [class.elegido]="servicios().includes(s.slug)">
+                    <input
+                      type="checkbox"
+                      [checked]="servicios().includes(s.slug)"
+                      (change)="alternarServicio(s.slug)"
+                    />
+                    <span class="servicio-texto">
+                      <span class="servicio-nombre">{{ s.nombre }}</span>
+                      <span class="servicio-descripcion">{{ s.descripcion }}</span>
+                    </span>
+                    <span class="servicio-precio">+ {{ s.precio | pesos }} <small>{{ unidadServicio() }}</small></span>
+                  </label>
+                </li>
+              }
+            </ul>
+          }
+        </fieldset>
+
+        <!-- 4. Datos -->
+        <form id="datos-reserva" class="paso" [formRoot]="datos" aria-labelledby="titulo-datos">
+          <h2 id="titulo-datos" class="legend"><span class="numero">4</span> Tus datos</h2>
+
+          <div class="campos">
+            <div class="campo">
+              <label for="nombre">Nombre completo</label>
+              <input
+                id="nombre"
+                autocomplete="name"
+                [formField]="datos.nombre"
+                [attr.aria-invalid]="datos.nombre().touched() && datos.nombre().invalid()"
+                aria-describedby="error-nombre"
+              />
+              <p id="error-nombre" class="error-campo">
+                @if (datos.nombre().touched() && datos.nombre().invalid()) {
+                  {{ datos.nombre().errors()[0].message }}
+                }
+              </p>
+            </div>
+
+            <div class="campo">
+              <label for="email">Correo</label>
+              <input
+                id="email"
+                type="email"
+                autocomplete="email"
+                [formField]="datos.email"
+                [attr.aria-invalid]="datos.email().touched() && datos.email().invalid()"
+                aria-describedby="error-email"
+              />
+              <p id="error-email" class="error-campo">
+                @if (datos.email().touched() && datos.email().invalid()) {
+                  {{ datos.email().errors()[0].message }}
+                }
+              </p>
+            </div>
+
+            <div class="campo">
+              <label for="telefono">Celular o WhatsApp</label>
+              <input
+                id="telefono"
+                type="tel"
+                autocomplete="tel"
+                inputmode="tel"
+                [formField]="datos.telefono"
+                [attr.aria-invalid]="datos.telefono().touched() && datos.telefono().invalid()"
+                aria-describedby="error-telefono"
+              />
+              <p id="error-telefono" class="error-campo">
+                @if (datos.telefono().touched() && datos.telefono().invalid()) {
+                  {{ datos.telefono().errors()[0].message }}
+                }
+              </p>
+            </div>
+
+            <div class="campo campo-ancho">
+              <label for="notas">¿Algo que debamos saber? <span class="opcional">(opcional)</span></label>
+              <textarea
+                id="notas"
+                rows="3"
+                placeholder="Una celebración, una sorpresa, hora aproximada de llegada…"
+                [formField]="datos.notas"
+                aria-describedby="error-notas"
+              ></textarea>
+              <p id="error-notas" class="error-campo">
+                @if (datos.notas().invalid()) {
+                  {{ datos.notas().errors()[0].message }}
+                }
+              </p>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- ─── Resumen ─── -->
+      <aside class="resumen" aria-labelledby="titulo-resumen">
+        <h2 id="titulo-resumen">Tu reserva</h2>
+
+        <p class="resumen-tipo">{{ cabana()?.nombre ?? 'Cabaña Primavera' }} · {{ huespedes() }} personas</p>
+        <p class="resumen-fechas">{{ resumenFechas() ?? 'Elige tus fechas en el calendario.' }}</p>
+
+        <div class="resumen-detalle" aria-live="polite">
+          @if (cotizacion.hasValue()) {
+            @let c = cotizacion.value();
+            <ul class="lineas">
+              @for (linea of c.alojamiento; track linea.concepto) {
+                <li>
+                  <span>{{ linea.concepto }}</span><span>{{ linea.precio | pesos }}</span>
+                </li>
+              }
+              @for (s of c.servicios; track s.slug) {
+                <li>
+                  <span>{{ s.nombre }} × {{ s.cantidad }}</span><span>{{ s.subtotal | pesos }}</span>
+                </li>
+              }
+            </ul>
+            <p class="total">
+              <span>Total</span><strong>{{ c.total | pesos }}</strong>
+            </p>
+            @if (!c.disponible) {
+              <p class="mensaje-error" role="alert">
+                Ese horario se acaba de ocupar. Elige otras fechas en el calendario.
+              </p>
+            }
+          } @else if (cotizacion.isLoading()) {
+            <p class="aclaracion">Calculando el precio…</p>
+          } @else if (errorCotizacion(); as error) {
+            <p class="mensaje-error" role="alert">{{ error }}</p>
+          }
+        </div>
+
+        @if (errorEnvio(); as error) {
+          <p class="mensaje-error" role="alert">{{ error }}</p>
+        }
+
+        <button type="submit" form="datos-reserva" class="boton boton-principal confirmar" [disabled]="!puedeConfirmar()">
+          {{ datos().submitting() ? 'Apartando…' : 'Apartar mi reserva' }}
+        </button>
+        <p class="aclaracion">
+          Cancelación: 100% de reembolso con 24 h de anticipación, 50% con 12 h. El pago se hace en línea.
+        </p>
+      </aside>
+    </div>
+  </section>
+}
