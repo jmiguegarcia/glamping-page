@@ -1,0 +1,64 @@
+.resultado {
+  display: grid;
+  gap: 1.5rem;
+  justify-items: start;
+  max-width: 760px;
+  min-height: 60vh;
+  align-content: start;
+}
+
+.icono {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.icono-exito {
+  background: var(--oliva);
+  color: var(--crema);
+}
+
+.icono-error {
+  background: var(--arena);
+  color: var(--noche);
+}
+
+.tarjeta {
+  padding: 1.5rem 2rem;
+  border-radius: var(--radio-grande);
+  background: var(--noche);
+  color: var(--crema-noche);
+
+  .aclaracion {
+    color: var(--crema-noche-suave);
+  }
+}
+
+.codigo {
+  font-family: var(--fuente-titulo);
+  font-size: clamp(2rem, 6vw, 3rem);
+  letter-spacing: 0.06em;
+  color: var(--arena);
+}
+
+.aclaracion {
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.mensaje-error {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radio);
+  background: #fbeae6;
+  color: #8a2e1d;
+}

@@ -1,0 +1,85 @@
+<section class="resultado contenedor seccion" aria-live="polite">
+  @switch (estado()) {
+    @case ('consultando') {
+      <span class="etiqueta">Pago</span>
+      <h1>Confirmando tu pago…</h1>
+      <p class="entradilla">Estamos consultando el resultado con Wompi. Esto toma solo unos segundos.</p>
+    }
+
+    @case ('aprobado') {
+      <span class="icono icono-exito" aria-hidden="true">✓</span>
+      <span class="etiqueta">Reserva confirmada</span>
+      <h1>¡Pago aprobado! <em>Te esperamos en la cabaña.</em></h1>
+      <div class="tarjeta">
+        <p>Código de reserva</p>
+        <p class="codigo">{{ codigo() }}</p>
+        <p class="aclaracion">Pagaste {{ resultado.value()?.total | pesos }}. Guarda tu código para cualquier consulta.</p>
+      </div>
+      <a class="boton boton-principal" routerLink="/">Volver al inicio</a>
+    }
+
+    @case ('pendiente') {
+      <span class="etiqueta">Pago en proceso</span>
+      <h1>Tu banco está <em>confirmando el pago.</em></h1>
+      @if (seguiraConsultando()) {
+        <p class="entradilla">No cierres esta página: se actualizará sola en cuanto tengamos la respuesta.</p>
+      } @else {
+        <p class="entradilla">
+          Está tardando más de lo normal. Puedes recargar esta página en unos minutos para ver el resultado.
+        </p>
+      }
+      <p class="aclaracion">Código de reserva: <strong>{{ codigo() }}</strong></p>
+    }
+
+    @case ('rechazado') {
+      <span class="icono icono-error" aria-hidden="true">!</span>
+      <span class="etiqueta">Pago no completado</span>
+      <h1>El pago no se <em>pudo completar.</em></h1>
+      @if (puedeReintentar()) {
+        <p class="entradilla">No se hizo ningún cobro. Tus fechas siguen apartadas un rato más: puedes intentarlo de nuevo.</p>
+        @if (errorReintento(); as error) {
+          <p class="mensaje-error" role="alert">{{ error }}</p>
+        }
+        <div class="acciones">
+          <button type="button" class="boton boton-principal" [disabled]="redirigiendo()" (click)="reintentar()">
+            {{ redirigiendo() ? 'Abriendo el pago seguro…' : 'Intentar de nuevo' }}
+          </button>
+          <a class="boton boton-borde" routerLink="/">Volver al inicio</a>
+        </div>
+      } @else {
+        <p class="entradilla">El tiempo para pagar esta reserva terminó y las fechas se liberaron.</p>
+        <a class="boton boton-principal" routerLink="/reservar">Hacer una nueva reserva</a>
+      }
+    }
+
+    @case ('pagado-sin-cupo') {
+      <span class="icono icono-error" aria-hidden="true">!</span>
+      <span class="etiqueta">Necesitamos hablar contigo</span>
+      <h1>Recibimos tu pago, <em>pero el horario ya no estaba libre.</em></h1>
+      <p class="entradilla">
+        Te devolveremos el dinero o te ayudaremos a elegir otra fecha. Escríbenos con tu código
+        <strong>{{ codigo() }}</strong>.
+      </p>
+      <a class="boton boton-principal" href="https://www.instagram.com/cabana_primavera" target="_blank" rel="noopener">
+        Escribir por Instagram
+      </a>
+    }
+
+    @case ('error') {
+      <span class="etiqueta">Pago</span>
+      <h1>No pudimos consultar <em>tu pago.</em></h1>
+      <p class="entradilla">{{ mensajeError() }}</p>
+      <div class="acciones">
+        <button type="button" class="boton boton-principal" (click)="resultado.reload()">Volver a consultar</button>
+        <a class="boton boton-borde" routerLink="/">Volver al inicio</a>
+      </div>
+    }
+
+    @case ('sin-pago') {
+      <span class="etiqueta">Pago</span>
+      <h1>No encontramos <em>un pago para revisar.</em></h1>
+      <p class="entradilla">Si acabas de pagar, vuelve a abrir el enlace al que te envió Wompi.</p>
+      <a class="boton boton-borde" routerLink="/">Volver al inicio</a>
+    }
+  }
+</section>

@@ -36,11 +36,23 @@
     </dl>
 
     <p class="aviso-pago" role="status">
-      Tus fechas quedan apartadas hasta las <strong>{{ horaLimite(r.expiraEn) }}</strong> mientras completas el pago
-      en línea, que estará disponible muy pronto. Te escribiremos a <strong>{{ r.cliente.email }}</strong>.
+      Tus fechas quedan apartadas hasta las <strong>{{ horaLimite(r.expiraEn) }}</strong>. Completa el pago antes de
+      esa hora para confirmar tu reserva.
     </p>
 
-    <a class="boton boton-borde" routerLink="/">Volver al inicio</a>
+    @if (errorPago(); as error) {
+      <p class="mensaje-error" role="alert">{{ error }}</p>
+    }
+
+    <div class="acciones-confirmacion">
+      <button type="button" class="boton boton-principal" [disabled]="redirigiendo()" (click)="pagar(r.codigo)">
+        {{ redirigiendo() ? 'Abriendo el pago seguro…' : 'Pagar ' + (r.total | pesos) }}
+      </button>
+      <a class="boton boton-borde" routerLink="/">Volver al inicio</a>
+    </div>
+    <p class="aclaracion">
+      Pagas en la página segura de Wompi (Bancolombia): tarjeta, PSE, Nequi, botón Bancolombia o Daviplata.
+    </p>
   </section>
 } @else {
   <section class="reservar contenedor" aria-labelledby="titulo-reservar">

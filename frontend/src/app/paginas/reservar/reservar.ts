@@ -271,6 +271,21 @@ export class Reservar {
     }
   }
 
+  protected readonly redirigiendo = signal(false);
+  protected readonly errorPago = signal<string | undefined>(undefined);
+
+  /** Lleva al cliente al checkout de Wompi. Al terminar, Wompi lo devuelve a /reserva/:codigo/pago. */
+  protected async pagar(codigo: string) {
+    this.errorPago.set(undefined);
+    this.redirigiendo.set(true);
+    try {
+      window.location.href = await this.api.iniciarPago(codigo);
+    } catch (error) {
+      this.errorPago.set(mensajeDeError(error));
+      this.redirigiendo.set(false);
+    }
+  }
+
   protected borrarFechas() {
     this.entrada.set(undefined);
     this.salida.set(undefined);

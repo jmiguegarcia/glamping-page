@@ -69,7 +69,19 @@ export interface ReservaCreada {
   expiraEn: string | null;
 }
 
+/** Respuesta de GET /api/pagos/wompi/transacciones/:id */
+export interface ResultadoPago {
+  codigo: string;
+  estadoPago: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | 'ANULADO';
+  estadoReserva: 'PENDIENTE_PAGO' | 'CONFIRMADA' | 'CANCELADA' | 'EXPIRADA' | 'COMPLETADA';
+  total: number;
+}
+
 export const URL_COTIZAR = '/api/reservas/cotizar';
+
+export function urlResultadoPago(idTransaccion: string): string {
+  return `/api/pagos/wompi/transacciones/${encodeURIComponent(idTransaccion)}`;
+}
 
 export function urlDisponibilidad(desde: FechaISO, hasta: FechaISO): string {
   return `/api/disponibilidad?desde=${desde}&hasta=${hasta}`;
@@ -82,6 +94,14 @@ export class ReservasApi {
 
   crear(solicitud: SolicitudReserva): Promise<ReservaCreada> {
     return firstValueFrom(this.http.post<ReservaCreada>('/api/reservas', solicitud));
+  }
+
+  /** Prepara el cobro en el backend y devuelve la URL del checkout de Wompi (ya firmada). */
+  async iniciarPago(codigo: string): Promise<string> {
+    const { urlCheckout } = await firstValueFrom(
+      this.http.post<{ urlCheckout: string }>('/api/pagos/iniciar', { codigo }),
+    );
+    return urlCheckout;
   }
 }
 
