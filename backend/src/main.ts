@@ -16,6 +16,6 @@ async function bootstrap() {
   // Permite que el frontend de Angular llame a esta API desde otro puerto
   app.enableCors({ origin: process.env.FRONTEND_URL ?? 'http://localhost:4200' });
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3001);
 }
 await bootstrap();

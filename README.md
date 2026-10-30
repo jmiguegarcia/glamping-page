@@ -5,7 +5,7 @@ Sitio web con reservas en línea y servicios adicionales.
 | Carpeta | Tecnología | Puerto en desarrollo |
 |---|---|---|
 | `frontend/` | Angular 22 con SSR | http://localhost:4200 |
-| `backend/` | NestJS + Prisma 7 | http://localhost:3000/api |
+| `backend/` | NestJS + Prisma 7 | http://localhost:3001/api |
 | — | PostgreSQL 18 (base `cabana_primavera`) | 5432 |
 
 ## Primera vez
