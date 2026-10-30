@@ -83,9 +83,14 @@ Paso 0 — (solo si hace falta) preparar .gitignore u otro ajuste previo
 
 Paso 1 — feat(backend): agregar endpoint de salud
   Por qué juntos: ...
+
+  Archivos:
   ```
   git add backend/src/app.controller.ts backend/src/app.service.ts
-  git commit -m "feat(backend): agregar endpoint de salud"
+  ```
+  Mensaje del commit:
+  ```
+  feat(backend): agregar endpoint de salud
   ```
 
 Paso 2 — ...
@@ -103,8 +108,12 @@ Reglas para los comandos del plan:
 - `git add` siempre con rutas explícitas (archivos o carpetas concretas), nunca
   `git add -A` ni `git add .`. Si una carpeta entera va en un commit y su `.gitignore`
   ya excluye lo generado, puedes usar `git add backend/` y decirlo.
-- Los comandos deben funcionar tanto en PowerShell como en Git Bash (usa `-m "..."`;
-  para un cuerpo de mensaje, un segundo `-m "..."`).
+- **El `git add` y el mensaje van en bloques separados.** Del commit solo se da el
+  texto del mensaje, en su propio bloque, sin `git commit -m` ni comillas: el usuario
+  lo pega donde él prefiera (la caja de mensaje de Source Control de VS Code o su
+  propio comando). Si el commit necesita cuerpo, ponlo en el mismo bloque, separado
+  del título por una línea en blanco.
+- Los comandos deben funcionar tanto en PowerShell como en Git Bash.
 - Nunca propongas `--force`, `--no-verify` ni `--amend` sobre commits ya publicados.
 - Si la rama está atrasada respecto al remoto, añade antes del push:
   `git pull --rebase origin <rama>` y explica qué hace y qué hacer si hay conflictos.
