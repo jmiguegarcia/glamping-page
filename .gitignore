@@ -3,6 +3,7 @@ node_modules/
 dist/
 .angular/
 coverage/
+*.tsbuildinfo
 
 # Cliente de Prisma generado (se recrea con `npx prisma generate`)
 backend/src/generated/
