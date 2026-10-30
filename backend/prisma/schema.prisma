@@ -1,0 +1,17 @@
+// Esquema de la base de datos de Cabaña Primavera.
+// Aquí se definen las tablas (modelos). Después de cambiarlo ejecuta:
+//   npx prisma migrate dev --name <descripcion-del-cambio>
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Los modelos (Alojamiento, Servicio, Reserva...) se agregan en la etapa 2.

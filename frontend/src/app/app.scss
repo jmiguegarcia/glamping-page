@@ -1,0 +1,10 @@
+// Página temporal — el diseño real llega en la etapa 4.
+.en-construccion {
+  min-height: 100dvh;
+  display: grid;
+  place-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  text-align: center;
+  font-family: system-ui, sans-serif;
+}
