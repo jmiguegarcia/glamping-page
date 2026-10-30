@@ -1,0 +1,556 @@
+// Página de inicio. Los colores y tipografías vienen de las variables de styles.scss.
+
+:host {
+  display: block;
+}
+
+// Toda imagen con `fill` necesita un contenedor posicionado y con tamaño.
+figure {
+  margin: 0;
+}
+
+.experiencia-foto,
+.foto-principal,
+.galeria-foto,
+.noche-galeria figure,
+.ubicacion-foto {
+  position: relative;
+  overflow: hidden;
+
+  img {
+    object-fit: cover;
+    transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+}
+
+.encabezado-seccion {
+  display: grid;
+  gap: 1rem;
+  max-width: 46rem;
+  margin-bottom: clamp(40px, 6vw, 64px);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.seccion-alterna {
+  background: var(--crema-2);
+}
+
+// ─── 1. Portada ───
+
+.portada {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  align-items: center;
+  gap: clamp(32px, 6vw, 80px);
+  padding-block: clamp(16px, 3vw, 40px) 0;
+}
+
+.portada-texto {
+  display: grid;
+  gap: 1.5rem;
+  justify-items: start;
+}
+
+.datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.75rem;
+  margin: 0.5rem 0 0;
+  padding: 1.25rem 0 0;
+  border-top: 1px solid var(--linea);
+  list-style: none;
+  color: var(--tinta-suave);
+  font-size: 0.95rem;
+
+  strong {
+    color: var(--tinta);
+    font-weight: 600;
+  }
+}
+
+.portada-fotos {
+  position: relative;
+  // Espacio para que el sello y la tarjeta sobresalgan sin cortarse.
+  padding: 28px 0 40px 28px;
+}
+
+.foto-principal {
+  // Alta como la foto, pero sin pasar del alto de la pantalla: los botones de la
+  // portada deben verse sin hacer scroll en un computador.
+  height: clamp(420px, calc(100svh - var(--alto-encabezado) - 120px), 640px);
+  border-radius: var(--radio-grande);
+  box-shadow: var(--sombra);
+}
+
+.sello {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 12px 30px -10px rgb(31 42 51 / 0.45);
+  outline: 6px solid var(--crema);
+  rotate: -8deg;
+}
+
+.tarjeta-noche {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  max-width: 270px;
+  padding: 0.6rem 1.1rem 0.6rem 0.6rem;
+  background: var(--noche);
+  color: var(--crema-noche);
+  border-radius: 18px;
+  box-shadow: var(--sombra);
+
+  figcaption {
+    font-family: var(--fuente-titulo);
+    font-size: 1.05rem;
+    line-height: 1.25;
+  }
+
+  em {
+    color: var(--arena);
+  }
+}
+
+.tarjeta-noche-foto {
+  flex: none;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+// ─── 2. Experiencias ───
+
+.experiencias {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(16px, 2.5vw, 28px);
+}
+
+.experiencia {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: var(--radio-grande);
+  overflow: hidden;
+  box-shadow: 0 1px 0 var(--linea);
+  transition: box-shadow 0.4s, transform 0.4s;
+
+  &:hover {
+    box-shadow: var(--sombra);
+    transform: translateY(-4px);
+
+    img {
+      transform: scale(1.05);
+    }
+  }
+}
+
+.experiencia-foto {
+  aspect-ratio: 4 / 3;
+}
+
+.experiencia-cuerpo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1rem;
+  padding: clamp(20px, 2.5vw, 28px);
+
+  > p {
+    color: var(--tinta-suave);
+  }
+}
+
+.experiencia-datos {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 1rem 0;
+  border-block: 1px solid var(--linea);
+  font-size: 0.9rem;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  dt {
+    color: var(--tinta-suave);
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 500;
+    text-align: right;
+  }
+}
+
+.experiencia-pie {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: auto;
+  justify-items: start;
+}
+
+.precio {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+
+  strong {
+    font-family: var(--fuente-titulo);
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: var(--azul);
+  }
+}
+
+.precio-desde,
+.precio-unidad,
+.nota {
+  font-size: 0.85rem;
+  color: var(--tinta-suave);
+}
+
+.precio-cargando {
+  width: 60%;
+  height: 2.2rem;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--crema-2), var(--crema), var(--crema-2)) 0 0 / 200% 100%;
+  animation: brillo 1.4s infinite linear;
+}
+
+@keyframes brillo {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+// ─── 3. La cabaña ───
+
+.cabana {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  align-items: center;
+  gap: clamp(32px, 6vw, 80px);
+}
+
+.cabana-texto {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.caracteristicas {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+
+    // Pequeño pino del logo como viñeta.
+    &::before {
+      content: '';
+      flex: none;
+      width: 10px;
+      height: 14px;
+      background: var(--oliva);
+      clip-path: polygon(50% 0, 100% 75%, 62% 75%, 62% 100%, 38% 100%, 38% 75%, 0 75%);
+    }
+  }
+}
+
+// 3 filas sin huecos:
+//   [ 1 alta ][ 2 ]
+//   [ 1 alta ][ 3 ]
+//   [   4 panorámica  ]
+.galeria {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-areas:
+    'alta a'
+    'alta b'
+    'ancha ancha';
+  // La fila panorámica es más alta para que entren la malla y la ciudad al fondo.
+  grid-template-rows: repeat(2, clamp(130px, 15vw, 200px)) clamp(170px, 21vw, 280px);
+  gap: clamp(10px, 1.4vw, 16px);
+}
+
+.galeria-foto {
+  border-radius: var(--radio);
+
+  &:nth-child(1) {
+    grid-area: alta;
+  }
+
+  &:nth-child(2) {
+    grid-area: a;
+  }
+
+  &:nth-child(3) {
+    grid-area: b;
+  }
+
+  &:nth-child(4) {
+    grid-area: ancha;
+
+    // Encuadre un poco más abajo: entran la malla y el cojín, y el borde inferior
+    // de la foto (donde está la marca de la app que la editó) queda fuera.
+    img {
+      object-position: center 58%;
+    }
+  }
+
+  &:hover img {
+    transform: scale(1.06);
+  }
+}
+
+// ─── Cinta ───
+
+.cinta {
+  overflow: hidden;
+  padding-block: 22px;
+  background: var(--azul);
+  color: var(--crema);
+}
+
+.cinta-pista {
+  display: flex;
+  gap: 1.75rem;
+  width: max-content;
+  font-family: var(--fuente-titulo);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  font-style: italic;
+  white-space: nowrap;
+  animation: desplazar 40s linear infinite;
+}
+
+.cinta-estrella {
+  color: var(--arena);
+  font-style: normal;
+}
+
+@keyframes desplazar {
+  to {
+    transform: translateX(-50%); // el contenido está duplicado: al 50% vuelve a empezar igual
+  }
+}
+
+// ─── Del día a la noche ───
+
+.atardecer {
+  height: clamp(120px, 16vw, 220px);
+  background: linear-gradient(to bottom, var(--crema) 0%, var(--arena-suave) 30%, #9c8a7c 55%, var(--azul) 78%, var(--noche) 100%);
+}
+
+// ─── 4. De noche ───
+
+.noche {
+  background: var(--noche);
+  color: var(--crema-noche);
+  padding-top: clamp(24px, 4vw, 48px);
+
+  .etiqueta {
+    color: var(--arena);
+  }
+
+  h2 em {
+    color: var(--arena);
+  }
+
+  .entradilla {
+    color: var(--crema-noche-suave);
+  }
+}
+
+.noche-galeria {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-auto-rows: clamp(150px, 18vw, 240px);
+  gap: clamp(10px, 1.4vw, 16px);
+
+  figure {
+    border-radius: var(--radio);
+
+    &:hover img {
+      transform: scale(1.06);
+    }
+  }
+}
+
+.noche-principal {
+  grid-row: span 2;
+}
+
+// ─── 5. Servicios ───
+
+.servicios {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--linea); // las líneas entre tarjetas son este fondo asomándose por el gap
+  border: 1px solid var(--linea);
+  border-radius: var(--radio-grande);
+  overflow: hidden;
+}
+
+.servicio {
+  display: grid;
+  align-content: start;
+  gap: 0.6rem;
+  padding: clamp(24px, 3vw, 32px);
+  background: var(--crema);
+
+  p {
+    color: var(--tinta-suave);
+    font-size: 0.95rem;
+  }
+}
+
+.servicio-numero {
+  font-family: var(--fuente-titulo);
+  font-style: italic;
+  color: var(--arena);
+  font-size: 1.1rem;
+}
+
+.servicio-precio {
+  margin-top: 0.5rem;
+  font-weight: 600;
+  color: var(--azul) !important;
+
+  span {
+    font-weight: 400;
+    color: var(--tinta-suave);
+  }
+}
+
+.aclaracion {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+}
+
+.bueno-saber {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin: clamp(48px, 6vw, 72px) 0 0;
+  padding: clamp(24px, 3vw, 32px);
+  background: var(--crema-2);
+  border-radius: var(--radio-grande);
+
+  dt {
+    margin-bottom: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--oliva);
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+// ─── 6. Ubicación ───
+
+.ubicacion {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(32px, 6vw, 80px);
+}
+
+.ubicacion-foto {
+  aspect-ratio: 1;
+  border-radius: var(--radio-grande);
+}
+
+.ubicacion-texto {
+  display: grid;
+  gap: 1.5rem;
+  justify-items: start;
+}
+
+.instagram {
+  font-size: 0.95rem;
+  color: var(--tinta-suave);
+
+  a {
+    font-weight: 600;
+  }
+}
+
+// ─── Celular y tableta ───
+
+@media (max-width: 900px) {
+  .portada,
+  .cabana,
+  .ubicacion {
+    grid-template-columns: 1fr;
+  }
+
+  // En celular la foto va primero: es lo que más vende.
+  .portada-fotos {
+    order: -1;
+    padding: 20px 0 32px 20px;
+  }
+
+  .foto-principal {
+    height: auto;
+    aspect-ratio: 4 / 5;
+  }
+
+  .sello {
+    width: 84px;
+    height: 84px;
+  }
+
+  .experiencias {
+    grid-template-columns: 1fr;
+  }
+
+  .noche-galeria {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .noche-principal {
+    grid-column: span 2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinta-pista {
+    animation: none;
+  }
+
+  .experiencia:hover,
+  .experiencia:hover img,
+  .galeria-foto:hover img,
+  .noche-galeria figure:hover img {
+    transform: none;
+  }
+}

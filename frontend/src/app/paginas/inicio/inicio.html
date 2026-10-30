@@ -1,0 +1,238 @@
+<!-- ─── 1. Portada ─── -->
+<section class="portada contenedor" aria-labelledby="titulo-portada">
+  <div class="portada-texto">
+    <span class="etiqueta">Glamping · Vía Bello – San Félix</span>
+    <h1 id="titulo-portada">Una cabaña entre las nubes, <em>con Medellín a tus pies.</em></h1>
+    <p class="entradilla">
+      Jacuzzi privado, madera, montaña y una vista al valle que cambia del día a la noche. Un refugio pensado para dos.
+    </p>
+
+    <div class="acciones">
+      <a class="boton boton-principal" routerLink="/reservar">Reservar</a>
+      <a class="boton boton-borde" routerLink="/" fragment="experiencias">Ver experiencias</a>
+    </div>
+
+    <ul class="datos">
+      <li><strong>{{ cabana()?.capacidad ?? 2 }}</strong> personas</li>
+      <li><strong>Jacuzzi</strong> con vista</li>
+      @if (precioDesde(); as desde) {
+        <li>Desde <strong>{{ desde | pesos }}</strong></li>
+      }
+    </ul>
+  </div>
+
+  <div class="portada-fotos">
+    <div class="foto-principal">
+      <img
+        ngSrc="jacuzzi-dia-nubes"
+        fill
+        priority
+        sizes="(max-width: 900px) 100vw, 45vw"
+        alt="Jacuzzi en la terraza de la cabaña frente a un cielo con nubes y el valle de Medellín"
+      />
+    </div>
+    <img ngSrc="logo" width="112" height="112" alt="" class="sello" />
+    <figure class="tarjeta-noche">
+      <img ngSrc="jacuzzi-noche-ciudad" width="72" height="72" alt="" class="tarjeta-noche-foto" />
+      <figcaption>Y de noche, <em>las luces de la ciudad.</em></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ─── 2. Experiencias ─── -->
+<section id="experiencias" class="seccion" aria-labelledby="titulo-experiencias">
+  <div class="contenedor">
+    <header class="encabezado-seccion" appRevelar>
+      <span class="etiqueta">Tres formas de vivirla</span>
+      <h2 id="titulo-experiencias">Quédate la noche, <em>ven por el día</em> o regálate unas horas.</h2>
+    </header>
+
+    <div class="experiencias">
+      @for (exp of experiencias(); track exp.tipo) {
+        <article class="experiencia" appRevelar>
+          <div class="experiencia-foto">
+            <img [ngSrc]="exp.foto" fill sizes="(max-width: 900px) 100vw, 33vw" [alt]="exp.alt" />
+          </div>
+          <div class="experiencia-cuerpo">
+            <h3>{{ exp.titulo }}</h3>
+            <p>{{ exp.descripcion }}</p>
+
+            @if (exp.horario) {
+              <dl class="experiencia-datos">
+                <div>
+                  <dt>Horario</dt>
+                  <dd>{{ exp.horario }}</dd>
+                </div>
+                <div>
+                  <dt>Días</dt>
+                  <dd>{{ exp.dias }}</dd>
+                </div>
+              </dl>
+            }
+
+            <div class="experiencia-pie">
+              @if (exp.precio) {
+                <p class="precio">
+                  <span class="precio-desde">Desde</span>
+                  <strong>{{ exp.precio | pesos }}</strong>
+                  <span class="precio-unidad">{{ exp.unidad }}</span>
+                </p>
+              } @else if (cargando()) {
+                <p class="precio precio-cargando" aria-hidden="true"></p>
+              }
+              @if (exp.nota) {
+                <p class="nota">{{ exp.nota }}</p>
+              }
+              <a class="boton boton-borde" routerLink="/reservar" [queryParams]="{ tipo: exp.tipo }">
+                Ver disponibilidad
+              </a>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ─── 3. La cabaña (de día) ─── -->
+<section id="cabana" class="seccion seccion-alterna" aria-labelledby="titulo-cabana">
+  <div class="contenedor cabana">
+    <div class="cabana-texto" appRevelar>
+      <span class="etiqueta">La cabaña</span>
+      <h2 id="titulo-cabana">Madera, montaña <em>y cielo abierto.</em></h2>
+      <p class="entradilla">
+        Una cabaña de madera colgada de la montaña, con ventanales hacia el valle y una terraza donde el jacuzzi
+        mira directo a Medellín.
+      </p>
+      <ul class="caracteristicas">
+        <li>Jacuzzi privado en la terraza</li>
+        <li>Malla mirador suspendida sobre el valle</li>
+        <li>Cama doble en cabaña de madera</li>
+        <li>Para {{ cabana()?.capacidad ?? 2 }} personas</li>
+      </ul>
+    </div>
+
+    <div class="galeria" appRevelar>
+      @for (foto of galeriaDia; track foto.nombre) {
+        <figure class="galeria-foto">
+          <img [ngSrc]="foto.nombre" fill sizes="(max-width: 900px) 50vw, 25vw" [alt]="foto.alt" />
+        </figure>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Cinta que cruza la página (decorativa) -->
+<div class="cinta" aria-hidden="true">
+  <div class="cinta-pista">
+    @for (vuelta of [1, 2]; track vuelta) {
+      @for (texto of cinta; track texto) {
+        <span>{{ texto }}</span>
+        <span class="cinta-estrella">✦</span>
+      }
+    }
+  </div>
+</div>
+
+<!-- Transición del día a la noche -->
+<div class="atardecer" aria-hidden="true"></div>
+
+<!-- ─── 4. De noche ─── -->
+<section id="noche" class="seccion noche" aria-labelledby="titulo-noche">
+  <div class="contenedor">
+    <header class="encabezado-seccion" appRevelar>
+      <span class="etiqueta">De noche</span>
+      <h2 id="titulo-noche">Cuando cae la noche, <em>Medellín se enciende a tus pies.</em></h2>
+      <p class="entradilla">
+        El jacuzzi se ilumina, las luces del valle aparecen una a una y la cabaña se vuelve el lugar para celebrar:
+        aniversarios, cumpleaños, pedidas de mano o simplemente estar juntos.
+      </p>
+    </header>
+
+    <div class="noche-galeria" appRevelar>
+      <figure class="noche-principal">
+        <img
+          ngSrc="jacuzzi-noche-ciudad"
+          fill
+          sizes="(max-width: 900px) 100vw, 50vw"
+          alt="Jacuzzi con velas frente a las luces de Medellín de noche"
+        />
+      </figure>
+      @for (foto of galeriaNoche; track foto.nombre) {
+        <figure>
+          <img [ngSrc]="foto.nombre" fill sizes="(max-width: 900px) 50vw, 25vw" [alt]="foto.alt" />
+        </figure>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ─── 5. Servicios adicionales ─── -->
+<section id="servicios" class="seccion" aria-labelledby="titulo-servicios">
+  <div class="contenedor">
+    <header class="encabezado-seccion" appRevelar>
+      <span class="etiqueta">Para hacerlo especial</span>
+      <h2 id="titulo-servicios">Agrega lo que <em>quieras a tu reserva.</em></h2>
+    </header>
+
+    @if (servicios().length) {
+      <ul class="servicios" appRevelar>
+        @for (servicio of servicios(); track servicio.slug; let i = $index) {
+          <li class="servicio">
+            <span class="servicio-numero" aria-hidden="true">0{{ i + 1 }}</span>
+            <h3>{{ servicio.nombre }}</h3>
+            <p>{{ servicio.descripcion }}</p>
+            <p class="servicio-precio">+ {{ servicio.precio | pesos }} <span>por noche</span></p>
+          </li>
+        }
+      </ul>
+      <p class="aclaracion">En estadías se cobran por cada noche; en día de sol y ocasional, una sola vez.</p>
+    } @else if (cargando()) {
+      <p class="aclaracion">Cargando servicios…</p>
+    } @else {
+      <p class="aclaracion">No pudimos cargar los servicios en este momento. Escríbenos por Instagram y te contamos.</p>
+    }
+
+    @if (bueno().length) {
+      <dl class="bueno-saber" appRevelar>
+        @for (item of bueno(); track item.titulo) {
+          <div>
+            <dt>{{ item.titulo }}</dt>
+            <dd>{{ item.texto }}</dd>
+          </div>
+        }
+      </dl>
+    }
+  </div>
+</section>
+
+<!-- ─── 6. Ubicación y cierre ─── -->
+<section id="ubicacion" class="seccion seccion-alterna" aria-labelledby="titulo-ubicacion">
+  <div class="contenedor ubicacion">
+    <figure class="ubicacion-foto" appRevelar>
+      <img
+        ngSrc="terraza-arbol"
+        fill
+        sizes="(max-width: 900px) 100vw, 50vw"
+        alt="Terraza con jacuzzi entre los árboles, con la ciudad al fondo"
+      />
+    </figure>
+
+    <div class="ubicacion-texto" appRevelar>
+      <span class="etiqueta">Ubicación</span>
+      <h2 id="titulo-ubicacion">Vía Bello – San Félix, <em>sobre el valle de Aburrá.</em></h2>
+      <p class="entradilla">
+        Arriba de Medellín, entre montañas y neblina. Al confirmar tu reserva te enviamos la ubicación exacta y cómo
+        llegar.
+      </p>
+      <div class="acciones">
+        <a class="boton boton-principal" routerLink="/reservar">Reservar mi escapada</a>
+        <a class="boton boton-borde" [href]="enlaceMapa" target="_blank" rel="noopener">Ver en el mapa</a>
+      </div>
+      <p class="instagram">
+        Más fotos y novedades en
+        <a href="https://www.instagram.com/cabana_primavera" target="_blank" rel="noopener">&#64;cabana_primavera</a>
+      </p>
+    </div>
+  </div>
+</section>

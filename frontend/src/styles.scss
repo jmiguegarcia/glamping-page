@@ -1,1 +1,228 @@
-/* You can add global styles to this file, and also import other style files */
+// ─────────────────────────────────────────────────────────────────────────────
+// Sistema de diseño "Cielo y madera" — Cabaña Primavera
+// Colores tomados del logo y de la paleta publicada en Instagram.
+// Los componentes usan estas variables; para cambiar un color se cambia aquí.
+// ─────────────────────────────────────────────────────────────────────────────
+
+:root {
+  // Día
+  --crema: #f7f2ea; // fondo principal
+  --crema-2: #efe6d8; // secciones alternas, tarjetas
+  --arena: #d9ae7e; // círculo del logo — solo decorativo (poco contraste para texto)
+  --arena-suave: #ead3b6;
+  --oliva: #4a5233; // pinos del logo — etiquetas, iconos
+  --azul: #345867; // Gray Azure — botones, títulos, enlaces
+  --azul-oscuro: #26424e;
+  --tinta: #1f2a33; // texto principal
+  --tinta-suave: #4b5862; // texto secundario
+  --linea: rgb(31 42 51 / 0.12);
+
+  // Noche
+  --noche: #14212c;
+  --noche-2: #1c2d3a;
+  --crema-noche: #f2ebda; // texto sobre noche (nunca blanco puro)
+  --crema-noche-suave: #c9c0ad;
+  --linea-noche: rgb(242 235 218 / 0.14);
+
+  // Tipografía
+  --fuente-titulo: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --fuente-texto: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  // Formas y espacios
+  --radio: 14px;
+  --radio-grande: 28px;
+  --sombra: 0 24px 48px -24px rgb(31 42 51 / 0.35);
+  --ancho-maximo: 1200px;
+  --margen-lateral: clamp(16px, 4vw, 40px);
+  --espacio-seccion: clamp(72px, 11vw, 136px);
+  --alto-encabezado: 72px;
+
+  color-scheme: light;
+}
+
+// ─── Base ───
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--alto-encabezado); // los enlaces #seccion no quedan bajo el encabezado
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--crema);
+  color: var(--tinta);
+  font-family: var(--fuente-texto);
+  font-size: 1rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: var(--azul);
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--fuente-titulo);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  font-optical-sizing: auto;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 6vw, 4.6rem);
+}
+
+h2 {
+  font-size: clamp(2rem, 4.5vw, 3.3rem);
+}
+
+h3 {
+  font-size: clamp(1.35rem, 2.2vw, 1.6rem);
+}
+
+// La cursiva de Fraunces es la "voz" cálida de la marca.
+h1 em,
+h2 em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--azul);
+}
+
+p {
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 3px solid var(--arena);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--arena-suave);
+}
+
+// ─── Utilidades ───
+
+.contenedor {
+  width: min(100% - 2 * var(--margen-lateral), var(--ancho-maximo));
+  margin-inline: auto;
+}
+
+.seccion {
+  padding-block: var(--espacio-seccion);
+}
+
+// Etiqueta en mayúsculas espaciadas, como "GLAMPING" en el logo.
+.etiqueta {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--oliva);
+}
+
+.entradilla {
+  font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+  color: var(--tinta-suave);
+  max-width: 34rem;
+}
+
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// ─── Botones ───
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding: 0.75rem 1.6rem;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  font: 600 0.95rem/1 var(--fuente-texto);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    transform 0.2s;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.boton-principal {
+  background: var(--azul);
+  color: var(--crema);
+
+  &:hover {
+    background: var(--azul-oscuro);
+  }
+}
+
+.boton-borde {
+  border-color: currentColor;
+  color: var(--azul);
+
+  &:hover {
+    background: var(--azul);
+    border-color: var(--azul);
+    color: var(--crema);
+  }
+}
+
+// ─── Aparición al hacer scroll (directiva appRevelar) ───
+// Solo se ocultan elementos que estaban fuera de la pantalla al cargar, así el
+// contenido nunca queda invisible sin JavaScript ni para Google.
+
+.revelar-oculto {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.revelar-visible {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .boton:hover {
+    transform: none;
+  }
+}

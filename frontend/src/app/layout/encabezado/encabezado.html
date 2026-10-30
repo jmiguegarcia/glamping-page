@@ -1,0 +1,31 @@
+<div class="barra contenedor">
+  <a class="marca" routerLink="/" (click)="menuAbierto.set(false)">
+    <img ngSrc="logo" width="44" height="44" alt="" class="marca-logo" priority />
+    <span class="marca-texto">
+      <span class="marca-nombre">Cabaña Primavera</span>
+      <span class="marca-lugar">Glamping · San Félix</span>
+    </span>
+  </a>
+
+  <button
+    type="button"
+    class="boton-menu"
+    [attr.aria-expanded]="menuAbierto()"
+    aria-controls="menu-principal"
+    (click)="menuAbierto.set(!menuAbierto())"
+  >
+    <span class="solo-lectores">{{ menuAbierto() ? 'Cerrar menú' : 'Abrir menú' }}</span>
+    <span class="hamburguesa" [class.abierta]="menuAbierto()" aria-hidden="true"></span>
+  </button>
+
+  <nav id="menu-principal" class="menu" [class.abierto]="menuAbierto()" aria-label="Principal">
+    <ul>
+      @for (enlace of enlaces; track enlace.fragmento) {
+        <li>
+          <a routerLink="/" [fragment]="enlace.fragmento" (click)="menuAbierto.set(false)">{{ enlace.texto }}</a>
+        </li>
+      }
+    </ul>
+    <a class="boton boton-principal" routerLink="/reservar" (click)="menuAbierto.set(false)">Reservar</a>
+  </nav>
+</div>
